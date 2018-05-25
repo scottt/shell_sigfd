@@ -165,13 +165,14 @@ wait_event:
                     printf(RED"user: "YELLOW"%ld\n", fdsi.ssi_utime);
                     printf(RED"sys : "YELLOW"%ld\n", fdsi.ssi_stime);                    
                     
-                    printf(RED "return value of " YELLOW "%s" RED " is " YELLOW "%d\n", 
-                        exeName, WEXITSTATUS(fdsi.ssi_status));
-                    //printf("isSignaled? %d\n", WIFSIGNALED(wstatus));
-                    if (WIFSIGNALED(wstatus))
+		    wstatus = fdsi.ssi_status;
+		    if (WIFEXITED(wstatus)) {
+                        printf(RED "return value of " YELLOW "%s" RED " is " YELLOW "%d\n",
+                               exeName, WEXITSTATUS(fdsi.ssi_status));
+		    } else if (WIFSIGNALED(wstatus)) {
                         printf(RED"the child process was terminated by a signal "YELLOW"%d"RED
                             ", named " YELLOW "%s.\n",  WTERMSIG(fdsi.ssi_status), sys_siglist[WTERMSIG(fdsi.ssi_status)]);
-
+            }
                     printf(NONE);
                     child_pid = -1;
                     //goto wait_event;
